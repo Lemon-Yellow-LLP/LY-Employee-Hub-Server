@@ -1,18 +1,15 @@
 const router = require("express").Router();
-const kekaController = require("../controllers/kekaController");
 const { isAuthenticated, isAdmin } = require("../middlewares/auth");
+const multer = require("multer");
+const kekaController = require("../controllers/kekaController");
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 
 router.get("/getAllEmployees", kekaController.getAllEmployees);
 router.get("/getAllEmployeesFromKeka", kekaController.getAllEmployeesFromKeka);
 router.get("/getToken", kekaController.getToken);
-
-// router.get("/getAllEmployees", isAuthenticated, isAdmin, kekaController.getAllEmployees);
-// router.get(
-//   "/getAllEmployeesFromKeka",
-//   isAuthenticated,
-//   isAdmin,
-//   kekaController.getAllEmployeesFromKeka
-// );
-// router.get("/getToken", isAuthenticated, isAdmin, kekaController.getToken);
+router.post("/bulkEmployeeRegister", upload.single("data"), kekaController.bulkEmployeeRegister);
 
 module.exports = router;

@@ -14,6 +14,20 @@ let body = new URLSearchParams({
   api_key: process.env.KEKA_API_KEY,
 });
 
+async function parseCSV(csvData) {
+  return new Promise((resolve, reject) => {
+    const results = [];
+
+    const parser = csvParser()
+      .on("data", (data) => results.push(data))
+      .on("end", () => resolve(results))
+      .on("error", (error) => reject(error));
+
+    const readableStream = fs.createReadStream(csvData);
+    readableStream.pipe(parser);
+  });
+}
+
 const kekaController = {
   getAllEmployees: async (req, res, next) => {
     try {
@@ -46,6 +60,22 @@ const kekaController = {
       const token = await axios.get(ApiUrl, body);
 
       res.status(200).json(token);
+    } catch (error) {
+      return next(createError.InternalServerError(error));
+    }
+  },
+  bulkEmployeeRegister: async (req, res, next) => {
+    try {
+      if (!req.file) {
+        return res.status(400).send("No file uploaded !!");
+      }
+
+      // const csvData = req.file.buffer.toString("utf-8");
+      // const parsedData = await parseCSV(csvData);
+
+      // await EmployeeSchema.insertMany(parsedData);
+
+      res.status(200).send("File uploaded and data added to DB.");
     } catch (error) {
       return next(createError.InternalServerError(error));
     }
